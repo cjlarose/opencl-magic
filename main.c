@@ -9,30 +9,9 @@
 #include "square.cl.h"
 
 // Hard-coded number of values to test, for convenience.
-#define NUM_VALUES 1024
-
-// A utility function that checks that our kernel execution performs the
-// requested work over the entire range of data.
-static int validate(cl_float* input, cl_float* output) {
-    int i;
-    for (i = 0; i < NUM_VALUES; i++) {
-        
-        // The kernel was supposed to square each value.
-        if ( output[i] != (input[i] * input[i]) ) {
-            fprintf(stdout,
-                    "Error: Element %d did not match expected output.\n", i);
-            fprintf(stdout,
-                    "       Saw %1.4f, expected %1.4f\n", output[i],
-                    input[i] * input[i]);
-            fflush(stdout);
-            return 0;
-        }
-    }
-    return 1;
-}
+#define NUM_VALUES (9 * 8)
 
 int main (int argc, const char * argv[]) {
-    int i;
     char name[128];
     
     // First, try to obtain a dispatch queue that can send work to the
@@ -53,28 +32,9 @@ int main (int argc, const char * argv[]) {
     clGetDeviceInfo(gpu, CL_DEVICE_NAME, 128, name, NULL);
     fprintf(stdout, "Created a dispatch queue using the %s\n", name);
     
-    // Here we hardcode some test data.
-    // Normally, when this application is running for real, data would come from
-    // some REAL source, such as a camera, a sensor, or some compiled collection
-    // of statistics—it just depends on the problem you want to solve.
-    float* test_in = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
-    for (i = 0; i < NUM_VALUES; i++) {
-        test_in[i] = (cl_float)i;
-    }
-    
     // Once the computation using CL is done, will have to read the results
     // back into our application's memory space.  Allocate some space for that.
     float* test_out = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
-    
-    // The test kernel takes two parameters: an input float array and an
-    // output float array.  We can't send the application's buffers above, since
-    // our CL device operates on its own memory space.  Therefore, we allocate
-    // OpenCL memory for doing the work.  Notice that for the input array,
-    // we specify CL_MEM_COPY_HOST_PTR and provide the fake input data we
-    // created above.  This tells OpenCL to copy the data into its memory
-    // space before it executes the kernel.                               // 3
-    void* mem_in  = gcl_malloc(sizeof(cl_float) * NUM_VALUES, test_in,
-                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR);
     
     // The output array is not initalized; we're going to fill it up when
     // we execute our kernel.                                             // 4
@@ -103,7 +63,7 @@ int main (int argc, const char * argv[]) {
             // that all the data is processed, this is 0
             // in the test case.                   // 7
             
-            {NUM_VALUES, 0, 0},    // The global range—this is how many items
+            {1024, 0, 0},    // The global range—this is how many items
             // IN TOTAL in each dimension you want to
             // process.
             
@@ -121,7 +81,7 @@ int main (int argc, const char * argv[]) {
         // expected OpenCL types.  Remember, a 'float' in the
         // kernel, is a 'cl_float' from the application's perspective.   // 8
         
-        square_kernel(&range,(cl_float*)mem_in, (cl_float*)mem_out);
+        square_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
         
         // Getting data out of the device's memory space is also easy;
         // use gcl_memcpy.  In this case, gcl_memcpy takes the output
@@ -133,17 +93,22 @@ int main (int argc, const char * argv[]) {
     });
     
     
-    // Check to see if the kernel did what it was supposed to:
-    if ( validate(test_in, test_out)) {
-        fprintf(stdout, "All values were properly squared.\n");
+    // Print results
+    int i, num_magic = 0;
+    for (i = 0; i < NUM_VALUES; i++) {
+        if (test_out[i]) {
+            num_magic++;
+            int a = i / 9 + 1;
+            int b = i % 9 + 1;
+            printf("a = %d, b = %d\n", a, b);
+        }
     }
+    printf("Total Magic Squares: %d\n", num_magic);
     
     // Don't forget to free up the CL device's memory when you're done. // 10
-    gcl_free(mem_in);
     gcl_free(mem_out);
     
     // And the same goes for system memory, as usual.
-    free(test_in);
     free(test_out);
     
     // Finally, release your queue just as you would any GCD queue.    // 11
