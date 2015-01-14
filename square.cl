@@ -6,7 +6,7 @@
 
 // Kernel block.                                      //   1
 
-int is_magic(int a, int b)
+int is_magic_order_3(int a, int b)
 {
     int taken[10] = {0};
     int a1, a2, a3, b1, b2, b3, c1, c2, c3;
@@ -30,7 +30,7 @@ int is_magic(int a, int b)
     return 1;
 }
 
-kernel void square(int max, global float* output)
+kernel void square_order_3(int max, global float* output)
 {
     size_t i = get_global_id(0);
     if (i > max)
@@ -41,5 +41,5 @@ kernel void square(int max, global float* output)
 
     //printf("i = %d, x = %d, y = %d\n", i, x, y);
 
-    output[i] = is_magic(x, y) ? 1.0 : 0.0;
+    output[i] = is_magic_order_3(x, y) ? 1.0 : 0.0;
 }

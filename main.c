@@ -49,7 +49,7 @@ int main (int argc, const char * argv[]) {
         // OpenCL to pick the one it thinks is best, we can also ask
         // OpenCL for the suggested size, and pass it ourselves.
         size_t wgs;
-        gcl_get_kernel_block_workgroup_info(square_kernel,
+        gcl_get_kernel_block_workgroup_info(square_order_3_kernel,
                                             CL_KERNEL_WORK_GROUP_SIZE,
                                             sizeof(wgs), &wgs, NULL);
         
@@ -81,7 +81,7 @@ int main (int argc, const char * argv[]) {
         // expected OpenCL types.  Remember, a 'float' in the
         // kernel, is a 'cl_float' from the application's perspective.   // 8
         
-        square_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
+        square_order_3_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
         
         // Getting data out of the device's memory space is also easy;
         // use gcl_memcpy.  In this case, gcl_memcpy takes the output
