@@ -115,35 +115,13 @@ kernel void square_order_4(int max, global unsigned char* output)
     if (global_id > max)
         return;
     
-    size_t i = global_id;
+    size_t id = global_id;
     int divisor = 16 * 16 * 16 * 16 * 16 * 16;
-    
-    size_t a = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16;
-    
-    size_t b = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16;
-    
-    size_t c = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16;
-    
-    size_t d = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16;
-    
-    size_t e = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16;
-    
-    size_t f = i / divisor + 1;
-    i %= divisor;
-    divisor /= 16; // divisor == 1;
-    
-    size_t g = i / divisor + 1;
-    //printf("i = %d\n", i);
-    //printf("a = %d, b = %d, c = %d,  = %d, e = %d, f = %d, g = %d\n", a, b, c, d, e, f, g);
-    output[global_id] = is_magic_order_4(a, b, c, d, e, f, g) ? 1 : 0;
+    size_t params[7];
+
+    int i;
+    for (i = 0; i < 7; id %= divisor, divisor /= 16, ++i)
+        params[i] = id / divisor + 1;
+
+    output[global_id] = is_magic_order_4(params[0], params[1], params[2], params[3], params[4], params[5], params[6]) ? 1 : 0;
 }
