@@ -30,9 +30,9 @@ int is_magic_order_3(int a, int b)
     return 1;
 }
 
-int is_magic_order_4(int a, int b, int c, int d, int e, int f, int g) {
-    int taken[17] = {0};
-    int a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
+int is_magic_order_4(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e, unsigned char f, unsigned char g) {
+    unsigned char taken[17] = {0};
+    unsigned char a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
     
     a1 = a;
     taken[a1] = 1;
@@ -117,7 +117,7 @@ kernel void square_order_4(int max, global unsigned char* output)
     
     size_t id = global_id;
     int divisor = 16 * 16 * 16 * 16 * 16 * 16;
-    size_t params[7];
+    unsigned char params[7];
 
     int i;
     for (i = 0; i < 7; id %= divisor, divisor /= 16, ++i)
