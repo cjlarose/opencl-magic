@@ -10,9 +10,9 @@
 #include "square.cl.h"
 
 // Hard-coded number of values to test, for convenience.
-#define NUM_VALUES (16 * 15 * 14 * 13 * 12 * 11 * 10)
+#define NUM_VALUES (16 * 16 * 16 * 16 * 16 * 16 * 16)
 
-void verify (float* test_out) {
+void verify (u_int8_t* test_out) {
     int i, num_magic = 0;
     for (i = 0; i < NUM_VALUES; i++) {
         if (test_out[i]) {
@@ -99,7 +99,7 @@ int main (int argc, const char * argv[]) {
     
     // Once the computation using CL is done, will have to read the results
     // back into our application's memory space.  Allocate some space for that.
-    float* test_out = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
+    uint8_t* test_out = (uint8_t*)malloc(sizeof(cl_uchar) * NUM_VALUES);
     
     if (test_out == NULL) {
         fprintf(stderr, "Unable to allocate memory for output vector");
@@ -109,7 +109,7 @@ int main (int argc, const char * argv[]) {
     // The output array is not initalized; we're going to fill it up when
     // we execute our kernel.                                             // 4
     void* mem_out =
-    gcl_malloc(sizeof(cl_float) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
+    gcl_malloc(sizeof(cl_uchar) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
     
     if (mem_out == NULL) {
         fprintf(stderr, "Unable to allocate memory for cl output vector");
@@ -138,7 +138,7 @@ int main (int argc, const char * argv[]) {
             // that all the data is processed, this is 0
             // in the test case.                   // 7
             
-            {67108864, 0, 0},    // The global range—this is how many items
+            {268435456, 0, 0},    // The global range—this is how many items
             // IN TOTAL in each dimension you want to
             // process.
             
@@ -156,14 +156,14 @@ int main (int argc, const char * argv[]) {
         // expected OpenCL types.  Remember, a 'float' in the
         // kernel, is a 'cl_float' from the application's perspective.   // 8
         
-        square_order_4_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
+        square_order_4_kernel(&range, NUM_VALUES - 1, (cl_uchar*) mem_out);
         
         // Getting data out of the device's memory space is also easy;
         // use gcl_memcpy.  In this case, gcl_memcpy takes the output
         // computed by the kernel and copies it over to the
         // application's memory space.                                   // 9
         
-        gcl_memcpy(test_out, mem_out, sizeof(cl_float) * NUM_VALUES);
+        gcl_memcpy(test_out, mem_out, sizeof(cl_uchar) * NUM_VALUES);
         
     });
     

@@ -109,41 +109,41 @@ kernel void square_order_3(int max, global float* output)
     output[i] = is_magic_order_3(x, y) ? 1.0 : 0.0;
 }
 
-kernel void square_order_4(int max, global float* output)
+kernel void square_order_4(int max, global unsigned char* output)
 {
     size_t global_id = get_global_id(0);
     if (global_id > max)
         return;
     
     size_t i = global_id;
-    int divisor = 15 * 14 * 13 * 12 * 11 * 10;
+    int divisor = 16 * 16 * 16 * 16 * 16 * 16;
     
     size_t a = i / divisor + 1;
     i %= divisor;
-    divisor /= 15;
+    divisor /= 16;
     
     size_t b = i / divisor + 1;
     i %= divisor;
-    divisor /= 14;
+    divisor /= 16;
     
     size_t c = i / divisor + 1;
     i %= divisor;
-    divisor /= 13;
+    divisor /= 16;
     
     size_t d = i / divisor + 1;
     i %= divisor;
-    divisor /= 12;
+    divisor /= 16;
     
     size_t e = i / divisor + 1;
     i %= divisor;
-    divisor /= 11;
+    divisor /= 16;
     
     size_t f = i / divisor + 1;
     i %= divisor;
-    divisor /= 10; // divisor == 1;
+    divisor /= 16; // divisor == 1;
     
     size_t g = i / divisor + 1;
     //printf("i = %d\n", i);
     //printf("a = %d, b = %d, c = %d,  = %d, e = %d, f = %d, g = %d\n", a, b, c, d, e, f, g);
-    output[global_id] = is_magic_order_4(a, b, c, d, e, f, g) ? 1.0 : 0.0;
+    output[global_id] = is_magic_order_4(a, b, c, d, e, f, g) ? 1 : 0;
 }
