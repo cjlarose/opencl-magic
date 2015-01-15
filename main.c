@@ -23,31 +23,31 @@ void verify (u_int8_t* test_out) {
             
             
             size_t k = i;
-            int divisor = 15 * 14 * 13 * 12 * 11 * 10;
+            int divisor = 16 * 16 * 16 * 16 * 16 * 16;
             
             size_t a = k / divisor + 1;
             k %= divisor;
-            divisor /= 15;
+            divisor /= 16;
             
             size_t b = k / divisor + 1;
             k %= divisor;
-            divisor /= 14;
+            divisor /= 16;
             
             size_t c = k / divisor + 1;
             k %= divisor;
-            divisor /= 13;
+            divisor /= 16;
             
             size_t d = k / divisor + 1;
             k %= divisor;
-            divisor /= 12;
+            divisor /= 16;
             
             size_t e = k / divisor + 1;
             k %= divisor;
-            divisor /= 11;
+            divisor /= 16;
             
             size_t f = k / divisor + 1;
             k %= divisor;
-            divisor /= 10; // divisor == 1;
+            divisor /= 16; // divisor == 1;
             
             size_t g = k / divisor + 1;
             
