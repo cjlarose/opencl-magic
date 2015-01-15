@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 // This include pulls in everything you need to develop with OpenCL in OS X.
 #include <OpenCL/opencl.h>
@@ -9,7 +10,71 @@
 #include "square.cl.h"
 
 // Hard-coded number of values to test, for convenience.
-#define NUM_VALUES (9 * 8)
+#define NUM_VALUES (16 * 15 * 14 * 13 * 12 * 11 * 10)
+
+void verify (float* test_out) {
+    int i, num_magic = 0;
+    for (i = 0; i < NUM_VALUES; i++) {
+        if (test_out[i]) {
+            num_magic++;
+            //int a = i / 9 + 1;
+            //int b = i % 9 + 1;
+            //printf("a = %d, b = %d\n", a, b);
+            
+            
+            size_t k = i;
+            int divisor = 15 * 14 * 13 * 12 * 11 * 10;
+            
+            size_t a = k / divisor + 1;
+            k %= divisor;
+            divisor /= 15;
+            
+            size_t b = k / divisor + 1;
+            k %= divisor;
+            divisor /= 14;
+            
+            size_t c = k / divisor + 1;
+            k %= divisor;
+            divisor /= 13;
+            
+            size_t d = k / divisor + 1;
+            k %= divisor;
+            divisor /= 12;
+            
+            size_t e = k / divisor + 1;
+            k %= divisor;
+            divisor /= 11;
+            
+            size_t f = k / divisor + 1;
+            k %= divisor;
+            divisor /= 10; // divisor == 1;
+            
+            size_t g = k / divisor + 1;
+            
+            size_t a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
+            a1 = a; a2 = f; a3 = 34 - a - c - f; a4 = c;
+            b1 = g; b2 = d; b3 = e; b4 = 34 - d - e - g;
+            c1 = b + c - g; c2 = a + b - e; c3 = 34 - a - b - d; c4 = d + e + g - b - c;
+            d1 = 34 - a - b - c; d2 = 34 - a - b - d + e - f; d3 = 2 * a + b + c + d - e + f - 34; d4 = b;
+            
+            assert(a1 + a2 + a3 + a4 == 34);
+            assert(b1 + b2 + b3 + b4 == 34);
+            assert(c1 + c2 + c3 + c4 == 34);
+            assert(d1 + d2 + d3 + d4 == 34);
+            
+            assert(a1 + b1 + c1 + d1 == 34);
+            assert(a2 + b2 + c2 + d2 == 34);
+            assert(a3 + b3 + c3 + d3 == 34);
+            assert(a4 + b4 + c4 + d4 == 34);
+            
+            assert(a1 + b2 + c3 + d4 == 34);
+            assert(a4 + b3 + c2 + d1 == 34);
+            
+            printf("a = %2d, b = %2d, c = %2d, d = %2d, e = %2d, f = %2d, g = %2d\n", a, b, c, d, e, f, g);
+        }
+    }
+    printf("Total Magic Squares: %d\n", num_magic);
+}
 
 int main (int argc, const char * argv[]) {
     char name[128];
@@ -36,10 +101,20 @@ int main (int argc, const char * argv[]) {
     // back into our application's memory space.  Allocate some space for that.
     float* test_out = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
     
+    if (test_out == NULL) {
+        fprintf(stderr, "Unable to allocate memory for output vector");
+        exit(1);
+    }
+    
     // The output array is not initalized; we're going to fill it up when
     // we execute our kernel.                                             // 4
     void* mem_out =
     gcl_malloc(sizeof(cl_float) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
+    
+    if (mem_out == NULL) {
+        fprintf(stderr, "Unable to allocate memory for cl output vector");
+        exit(1);
+    }
     
     // Dispatch the kernel block using one of the dispatch_ commands and the
     // queue created earlier.                                            // 5
@@ -49,7 +124,7 @@ int main (int argc, const char * argv[]) {
         // OpenCL to pick the one it thinks is best, we can also ask
         // OpenCL for the suggested size, and pass it ourselves.
         size_t wgs;
-        gcl_get_kernel_block_workgroup_info(square_order_3_kernel,
+        gcl_get_kernel_block_workgroup_info(square_order_4_kernel,
                                             CL_KERNEL_WORK_GROUP_SIZE,
                                             sizeof(wgs), &wgs, NULL);
         
@@ -63,7 +138,7 @@ int main (int argc, const char * argv[]) {
             // that all the data is processed, this is 0
             // in the test case.                   // 7
             
-            {1024, 0, 0},    // The global range—this is how many items
+            {67108864, 0, 0},    // The global range—this is how many items
             // IN TOTAL in each dimension you want to
             // process.
             
@@ -81,7 +156,7 @@ int main (int argc, const char * argv[]) {
         // expected OpenCL types.  Remember, a 'float' in the
         // kernel, is a 'cl_float' from the application's perspective.   // 8
         
-        square_order_3_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
+        square_order_4_kernel(&range, NUM_VALUES - 1, (cl_float*)mem_out);
         
         // Getting data out of the device's memory space is also easy;
         // use gcl_memcpy.  In this case, gcl_memcpy takes the output
@@ -94,16 +169,7 @@ int main (int argc, const char * argv[]) {
     
     
     // Print results
-    int i, num_magic = 0;
-    for (i = 0; i < NUM_VALUES; i++) {
-        if (test_out[i]) {
-            num_magic++;
-            int a = i / 9 + 1;
-            int b = i % 9 + 1;
-            printf("a = %d, b = %d\n", a, b);
-        }
-    }
-    printf("Total Magic Squares: %d\n", num_magic);
+    verify(test_out);
     
     // Don't forget to free up the CL device's memory when you're done. // 10
     gcl_free(mem_out);
