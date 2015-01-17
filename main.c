@@ -17,10 +17,6 @@ void verify (u_int8_t* test_out) {
     for (i = 0; i < NUM_VALUES; i++) {
         if (test_out[i]) {
             num_magic++;
-            //int a = i / 9 + 1;
-            //int b = i % 9 + 1;
-            //printf("a = %d, b = %d\n", a, b);
-            
             
             size_t k = i;
             int divisor = 16 * 16 * 16 * 16 * 16 * 16;
