@@ -2,15 +2,20 @@ OPENCLC=/System/Library/Frameworks/OpenCL.framework/Libraries/openclc
 BUILD_DIR=./build
 KERNEL_SRC=square.cl
 EXECUTABLE=magic
+.SUFFIXES:
 
-$(EXECUTABLE): square.cl.c square.cl.i386.bc square.cl.x86_64.bc square.cl.gpu_32.bc square.cl.gpu_64.bc
-	clang -c -Os -Wall -arch x86_64 -o $(BUILD_DIR)/square.cl.o -c square.cl.c
-	clang -c -Os -Wall -arch x86_64 -o $(BUILD_DIR)/main.o -c main.c
+$(EXECUTABLE): $(BUILD_DIR)/square.cl.o $(BUILD_DIR)/main.o square.cl.i386.bc square.cl.x86_64.bc square.cl.gpu_32.bc square.cl.gpu_64.bc
 	clang -framework OpenCL -o $@ $(BUILD_DIR)/square.cl.o $(BUILD_DIR)/main.o
 
-square.cl.c: $(KERNEL_SRC)
+$(BUILD_DIR)/square.cl.o: square.cl.c
 	mkdir -p $(BUILD_DIR)
-	# Generates both square.cl.h and square.cl.c
+	clang -c -Os -Wall -arch x86_64 -o $@ -c square.cl.c
+
+$(BUILD_DIR)/main.o: main.c square.cl.h
+	mkdir -p $(BUILD_DIR)
+	clang -c -Os -Wall -arch x86_64 -o $@ -c $<
+
+square.cl.c square.cl.h: $(KERNEL_SRC)
 	$(OPENCLC) -x cl -cl-std=CL1.1 -cl-auto-vectorize-enable -emit-gcl $(KERNEL_SRC)
 
 square.cl.i386.bc: $(KERNEL_SRC)
