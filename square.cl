@@ -1,3 +1,4 @@
+// vi: set ft=c :
 // Simple OpenCL kernel that squares an input array.
 // This code is stored in a file called mykernel.cl.
 // You can name your kernel file as you would name any other
@@ -95,7 +96,7 @@ int is_magic_order_4(unsigned char a, unsigned char b, unsigned char c, unsigned
     return 1;
 }
 
-kernel void square_order_3(int max, global float* output)
+kernel void square_order_3(int max, global unsigned char* output)
 {
     size_t i = get_global_id(0);
     if (i > max)
@@ -106,7 +107,7 @@ kernel void square_order_3(int max, global float* output)
 
     //printf("i = %d, x = %d, y = %d\n", i, x, y);
 
-    output[i] = is_magic_order_3(x, y) ? 1.0 : 0.0;
+    output[i] = is_magic_order_3(x, y);
 }
 
 kernel void square_order_4(int max, global unsigned char* output)
@@ -123,5 +124,5 @@ kernel void square_order_4(int max, global unsigned char* output)
     for (i = 0; i < 7; id %= divisor, divisor /= 16, ++i)
         params[i] = id / divisor + 1;
 
-    output[global_id] = is_magic_order_4(params[0], params[1], params[2], params[3], params[4], params[5], params[6]) ? 1 : 0;
+    output[global_id] = is_magic_order_4(params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
 }

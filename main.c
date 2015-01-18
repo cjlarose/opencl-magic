@@ -18,36 +18,36 @@ void verify (u_int8_t* test_out) {
         if (test_out[i]) {
             num_magic++;
             
-            size_t k = i;
+            int k = i;
             int divisor = 16 * 16 * 16 * 16 * 16 * 16;
             
-            size_t a = k / divisor + 1;
+            int a = k / divisor + 1;
             k %= divisor;
             divisor /= 16;
             
-            size_t b = k / divisor + 1;
+            int b = k / divisor + 1;
             k %= divisor;
             divisor /= 16;
             
-            size_t c = k / divisor + 1;
+            int c = k / divisor + 1;
             k %= divisor;
             divisor /= 16;
             
-            size_t d = k / divisor + 1;
+            int d = k / divisor + 1;
             k %= divisor;
             divisor /= 16;
             
-            size_t e = k / divisor + 1;
+            int e = k / divisor + 1;
             k %= divisor;
             divisor /= 16;
             
-            size_t f = k / divisor + 1;
+            int f = k / divisor + 1;
             k %= divisor;
             divisor /= 16; // divisor == 1;
             
-            size_t g = k / divisor + 1;
+            int g = k / divisor + 1;
             
-            size_t a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
+            int a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
             a1 = a; a2 = f; a3 = 34 - a - c - f; a4 = c;
             b1 = g; b2 = d; b3 = e; b4 = 34 - d - e - g;
             c1 = b + c - g; c2 = a + b - e; c3 = 34 - a - b - d; c4 = d + e + g - b - c;
