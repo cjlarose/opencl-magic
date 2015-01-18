@@ -2,3 +2,4 @@ magic
 *.bc
 square.cl.c
 square.cl.h
+*.xcodeproj
