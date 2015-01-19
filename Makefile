@@ -1,6 +1,5 @@
 OPENCLC=/System/Library/Frameworks/OpenCL.framework/Libraries/openclc
 BUILD_DIR=./build
-KERNEL_SRC=square.cl
 EXECUTABLE=magic
 .SUFFIXES:
 KERNEL_ARCH=i386 x86_64 gpu_32 gpu_64
@@ -17,10 +16,10 @@ $(BUILD_DIR)/main.o: main.c square.cl.h
 	mkdir -p $(BUILD_DIR)
 	clang -c -Os -Wall -arch x86_64 -o $@ -c $<
 
-square.cl.c square.cl.h: $(KERNEL_SRC)
-	$(OPENCLC) -x cl -cl-std=CL1.1 -cl-auto-vectorize-enable -emit-gcl $(KERNEL_SRC)
+square.cl.c square.cl.h: square.cl
+	$(OPENCLC) -x cl -cl-std=CL1.1 -cl-auto-vectorize-enable -emit-gcl $<
 
-square.cl.%.bc: $(KERNEL_SRC)
+square.cl.%.bc: square.cl
 	$(OPENCLC) -x cl -cl-std=CL1.1 -Os -arch $* -emit-llvm -o $@ -c $<
 
 .PHONY: clean
