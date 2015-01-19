@@ -110,13 +110,14 @@ kernel void square_order_3(int max, global unsigned char* output)
     output[i] = is_magic_order_3(x, y);
 }
 
-kernel void square_order_4(int max, global unsigned char* output)
+kernel void square_order_4(int max, unsigned long offset, global unsigned char* output)
 {
     size_t global_id = get_global_id(0);
-    if (global_id > max)
-        return;
     
-    size_t id = global_id;
+    size_t id = global_id + offset;
+    if (id > max)
+        return;
+
     int divisor = 16 * 16 * 16 * 16 * 16 * 16;
     unsigned char params[7];
 
